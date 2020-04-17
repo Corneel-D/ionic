@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { ComponentRef, NgZone } from '@angular/core';
+import { ComponentRef, EventEmitter, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnimationBuilder, RouterDirection } from '@ionic/core';
 
@@ -16,6 +16,8 @@ export class StackController {
   private tabsPrefix: string[] | undefined;
   private activeView: RouteView | undefined;
   private nextId = 0;
+
+  swipeBackEvent = new EventEmitter();
 
   constructor(
     tabsPrefix: string | undefined,
@@ -209,7 +211,8 @@ export class StackController {
   endBackTransition(shouldComplete: boolean) {
     if (shouldComplete) {
       this.skipTransition = true;
-      this.pop(1);
+      // this.pop(1);
+      this.swipeBackEvent.emit();
     } else if (this.activeView) {
       cleanup(this.activeView, this.views, this.views, this.location);
     }

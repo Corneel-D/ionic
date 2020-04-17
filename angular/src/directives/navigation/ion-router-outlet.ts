@@ -38,6 +38,7 @@ export class IonRouterOutlet implements OnDestroy, OnInit {
   @Output() stackEvents = new EventEmitter<any>();
   @Output('activate') activateEvents = new EventEmitter<any>();
   @Output('deactivate') deactivateEvents = new EventEmitter<any>();
+  @Output('swipeBack') swipeBackEvent = new EventEmitter<any>();
 
   set animation(animation: AnimationBuilder) {
     this.nativeEl.animation = animation;
@@ -76,10 +77,16 @@ export class IonRouterOutlet implements OnDestroy, OnInit {
     this.name = name || PRIMARY_OUTLET;
     this.tabsPrefix = tabs === 'true' ? getUrl(router, activatedRoute) : undefined;
     this.stackCtrl = new StackController(this.tabsPrefix, this.nativeEl, router, navCtrl, zone, commonLocation);
+    this.stackCtrl.swipeBackEvent.subscribe({
+      next: (data: any) => {
+          this.swipeBackEvent.emit(data);
+      }
+    });
     parentContexts.onChildOutletCreated(this.name, this as any);
   }
 
   ngOnDestroy(): void {
+    this.stackCtrl.swipeBackEvent.unsubscribe();
     this.stackCtrl.destroy();
   }
 
